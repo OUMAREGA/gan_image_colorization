@@ -1,5 +1,7 @@
 import numpy as np
 import glob
+import shutil
+
 import mimetypes
 from werkzeug.utils import secure_filename
 from matplotlib import pyplot as plt
@@ -106,12 +108,24 @@ def upload_file():
 
         return file.filename
 
-@app.route("/api/v1/predict", methods=["POST"])
-def predict():
+@app.route("/api/v1/save_predict", methods=["POST"])
+def save_predict():
+    files = glob.glob('outputs/*')
+    for f in files:
+        os.remove(f)
     image_name = run()
     folder = 'outputs/' + image_name
     mime_type = mimetypes.guess_type(folder)[0]
+
     return send_file('outputs/' + image_name, mimetype=mime_type)
+    return 'hello'
+
+@app.route("/api/v1/predict", methods=["GET"])
+def predict():
+    file = glob.glob("outputs/*")
+    if len(file) > 0:
+        mime_type = mimetypes.guess_type(file[0])[0]
+        return send_file(file[0], mimetype=mime_type)
 
 if __name__ == "__main__":
     app.run(debug=True)
