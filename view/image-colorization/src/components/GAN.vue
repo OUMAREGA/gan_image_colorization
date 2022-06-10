@@ -6,8 +6,8 @@
 
     <div class="mt-5" />
 
-    <div v-if="filePreview && !ganImage">
-      <h3>Previem uploaded image</h3>
+    <div data-aos="zoom-in" data-aos-duration="1500" v-if="filePreview && !ganImage">
+      <h3>Preview uploaded image</h3>
       <div class="previewBlock" @click="chooseFile" :style="{ 'background-image': `url(${filePreview})` }" />
     </div>
 
@@ -15,10 +15,10 @@
       <h3>GAN result</h3>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col>
+          <b-col data-as="fade-right">
             <div class="previewBlock" @click="chooseFile" :style="{ 'background-image': `url(${filePreview})` }" />
           </b-col>
-          <b-col>
+          <b-col data-aos="fade-left">
             <img class="previewBlock" :src="ganImage" />
           </b-col>
         </b-row>
@@ -27,6 +27,8 @@
 
     <button v-if="disabled" :disabled="disabled" class="btn mt-3 btn-dark">Go</button>
     <button v-else-if="!disabled && !loading" @click="savePredict" class="btn mt-3 btn-dark">Go</button>
+    <!--<button v-if="ganImage" @click="eraseCache" class="btn mt-3 btn-dark">Again</button>-->
+
     <b-spinner v-if="loading" label="Loading..."></b-spinner>
 
 
@@ -54,9 +56,6 @@ export default {
     }
   },
   methods: {
-    handleFileUpload() {
-      this.file = this.$refs.file.files[0];
-    },
     async savePredict() {
       this.loading = true;
       let formData = new FormData();
@@ -68,17 +67,23 @@ export default {
         'responseType': 'blob'
       }
       await axios.post('http://127.0.0.1:5000/api/v1/save_predict', formData, {headers})
-      .then(async (response) => {
-        console.log(response, response?.body, response?.response)
+      .then(async () => {
         await this.getImage()
         this.loading = false
       }).catch(e => {
            console.log(e)
       })
     },
+    eraseCache() {
+      //window.history.forward(1);
+      //location.reload(true);
+      this.filePreview = null
+      this.ganImage = false
+      this.$refs.file.value = null
+    },
 
     chooseFile () {
-      this.$refs.fileInput.click()
+      this.$refs.file.click()
     },
     selectImgFile () {
       this.file = this.$refs.file.files[0];
@@ -91,13 +96,14 @@ export default {
         }
         reader.readAsDataURL(this.file)
       }
+
     },
     getImage() {
       axios.get('http://127.0.0.1:5000/api/v1/predict', {
         responseType: 'blob'
       })
       .then((response) => {
-        console.log(response, response?.body, response?.response)
+        this.ganImage = null
         this.ganImage = window.URL.createObjectURL(response.data);
         this.$refs.file.value = null
       }).catch(e => {

@@ -113,12 +113,15 @@ def save_predict():
     files = glob.glob('outputs/*')
     for f in files:
         os.remove(f)
+    files = glob.glob('sample/*')
+    for f in files:
+        os.remove(f)
+
     image_name = run()
     folder = 'outputs/' + image_name
     mime_type = mimetypes.guess_type(folder)[0]
 
     return send_file('outputs/' + image_name, mimetype=mime_type)
-    return 'hello'
 
 @app.route("/api/v1/predict", methods=["GET"])
 def predict():

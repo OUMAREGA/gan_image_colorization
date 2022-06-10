@@ -13,6 +13,9 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue)
 
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+
 import router from '../router'
 
 Vue.use(VueAxios, axios)
@@ -26,4 +29,7 @@ Vue.config.productionTip = false
 new Vue({
   render: h => h(App),
   router,
+  mounted() {
+    AOS.init()
+  },
 }).$mount('#app')
